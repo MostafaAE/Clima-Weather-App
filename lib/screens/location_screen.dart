@@ -1,7 +1,8 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:clima/services/weather.dart';
 import 'package:flutter/material.dart';
 import 'package:clima/utilities/constants.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 
 class LocationScreen extends StatefulWidget {
   LocationScreen({this.locationWeather});
@@ -11,6 +12,37 @@ class LocationScreen extends StatefulWidget {
 }
 
 class _LocationScreenState extends State<LocationScreen> {
+  int temperature;
+  int condition;
+  String cityName;
+  IconData weatherIcon;
+  var weatherDate;
+  var weatherTime;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    updateUI(widget.locationWeather);
+  }
+
+  void updateUI(var weatherData) {
+    setState(() {
+      if (weatherData != null) {
+        temperature = weatherData['main']['temp'].toInt();
+        condition = weatherData['weather'][0]['id'];
+        cityName = weatherData['name'];
+      } else {
+        condition = 900;
+        temperature = 0;
+        cityName = 'Unable to get weather data.';
+      }
+      WeatherModel weatherModel = WeatherModel();
+      weatherDate = DateFormat.yMMMEd().format(DateTime.now());
+      weatherTime = DateFormat.jm().format(DateTime.now());
+      weatherIcon = weatherModel.getWeatherIcon(condition);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,7 +63,11 @@ class _LocationScreenState extends State<LocationScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      WeatherModel weatherModel = WeatherModel();
+                      var weatherData = await weatherModel.getLocationWeather();
+                      updateUI(weatherData);
+                    },
                     child: Icon(
                       Icons.near_me,
                       size: 50.0,
@@ -52,13 +88,13 @@ class _LocationScreenState extends State<LocationScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Icon(FontAwesomeIcons.sun,
+                  Icon(weatherIcon,
                       size: 180, color: Colors.white.withAlpha(200)),
                   SizedBox(
                     height: 10,
                   ),
                   AutoSizeText(
-                    '40°C',
+                    '$temperature°C',
                     style: kTempTextStyle,
                     textAlign: TextAlign.center,
                     maxLines: 1,
@@ -77,18 +113,18 @@ class _LocationScreenState extends State<LocationScreen> {
                 child: Column(
                   children: [
                     AutoSizeText(
-                      'Cairo',
+                      "$cityName",
                       style: kCityTextStyle,
                       maxLines: 1,
                     ),
                     AutoSizeText(
-                      '18 Apr 2021',
+                      "$weatherDate",
                       textAlign: TextAlign.center,
                       style: kTimeTextStyle,
                       maxLines: 1,
                     ),
                     AutoSizeText(
-                      '02:00 PM',
+                      "$weatherTime",
                       textAlign: TextAlign.center,
                       style: kTimeTextStyle,
                       maxLines: 1,
