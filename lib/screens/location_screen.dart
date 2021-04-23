@@ -3,6 +3,7 @@ import 'package:clima/services/weather.dart';
 import 'package:flutter/material.dart';
 import 'package:clima/utilities/constants.dart';
 import 'package:intl/intl.dart';
+import 'city_screen.dart';
 
 class LocationScreen extends StatefulWidget {
   LocationScreen({this.locationWeather});
@@ -12,6 +13,7 @@ class LocationScreen extends StatefulWidget {
 }
 
 class _LocationScreenState extends State<LocationScreen> {
+  WeatherModel weatherModel = WeatherModel();
   int temperature;
   int condition;
   String cityName;
@@ -36,7 +38,6 @@ class _LocationScreenState extends State<LocationScreen> {
         temperature = 0;
         cityName = 'Unable to get weather data.';
       }
-      WeatherModel weatherModel = WeatherModel();
       weatherDate = DateFormat.yMMMEd().format(DateTime.now());
       weatherTime = DateFormat.jm().format(DateTime.now());
       weatherIcon = weatherModel.getWeatherIcon(condition);
@@ -75,7 +76,17 @@ class _LocationScreenState extends State<LocationScreen> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      var typedCityName = await Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return CityScreen();
+                      }));
+                      if(typedCityName != null)
+                        {
+                          var weatherData = await weatherModel.getCityWeather(typedCityName);
+                          updateUI(weatherData);
+                        }
+                    },
                     child: Icon(
                       Icons.location_city,
                       size: 50.0,
