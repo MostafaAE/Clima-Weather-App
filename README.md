@@ -7,7 +7,7 @@ Clima Weather App is a Live Weather Application implemented using Flutter and Da
 ### Features
 
 * Current Weather Data of your location.
-* Cuttent Weather Data of any city you search for.
+* Current Weather Data of any city you search for.
 
 
 ![Clima Demo](https://user-images.githubusercontent.com/47731377/115956560-bb3dc200-a4fd-11eb-8149-7d83473d943f.gif)
